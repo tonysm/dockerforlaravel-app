@@ -14,7 +14,15 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    <p>
+                        You are logged in!
+                    </p>
+
+                    <form action="{{ route("home.store") }}" method="POST">
+                        @csrf
+
+                        <button class="btn btn-primary" type="submit">Dispatch the Example Job</button>
+                    </form>
                 </div>
             </div>
         </div>

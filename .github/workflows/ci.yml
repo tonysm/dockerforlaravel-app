@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@master
       - name: Get release version
         id: get_version
-        run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_SHA:10})
+        run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_SHA:0:10})
       - name: Publish PHP Image to Registry
         id: dockerphp
         uses: elgohr/Publish-Docker-Github-Action@master
@@ -68,5 +68,4 @@ jobs:
           cache: ${{ github.event_name != 'schedule' }}
       - name: Patch Infrastructure Manifests
         run: |
-          echo "Testing here"
-          echo $RELEASE_VERSION
+          echo "Published image tag: ${RELEASE_VERSION}"

@@ -1,0 +1,73 @@
+name: Publish Docker
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      testdb:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: "testdb"
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_ROOT_PASSWORD: "forge"
+          MYSQL_USER: "forge"
+          MYSQL_PASSWORD: "forge"
+          MYSQL_ROOT_HOST: "%"
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v1
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Install Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+      - name: Generate key
+        run: php artisan key:generate
+      - name: Execute tests
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: "127.0.0.1"
+          DB_PORT: ${{ job.services.testdb.ports['3306'] }}
+          DB_DATABASE: "testdb"
+          DB_PASSWORD: "forge"
+          DB_USERNAME: "forge"
+        run: vendor/bin/phpunit
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Get release version
+        id: get_version
+        run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
+      - name: Publish PHP Image to Registry
+        id: dockerphp
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: tonysm/docker4laravelapp-php
+          dockerfile: .docker/php/prod.Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: "latest,${{ env.RELEASE_VERSION }}"
+          cache: ${{ github.event_name != 'schedule' }}
+      - name: Publish Nginx Image to Registry
+        id: dockernginx
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: tonysm/docker4laravelapp-nginx
+          dockerfile: .docker/nginx/prod.Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: "latest,${{ env.RELEASE_VERSION }}"
+          cache: ${{ github.event_name != 'schedule' }}
+      - name: Patch Infrastructure Manifests
+        uses: ubuntu-latest
+        run: |
+          echo "Testing here"
+          echo $RELEASE_VERSION

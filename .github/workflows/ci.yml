@@ -67,7 +67,6 @@ jobs:
           tags: "latest,${{ env.RELEASE_VERSION }}"
           cache: ${{ github.event_name != 'schedule' }}
       - name: Patch Infrastructure Manifests
-        uses: ubuntu-latest
         run: |
           echo "Testing here"
           echo $RELEASE_VERSION

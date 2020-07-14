@@ -56,6 +56,10 @@ jobs:
           hub --version
           cd .. && rm -rf hub-linux-amd64-2.11.2/ hub-linux-amd64-2.11.2.tgz
 
+          # Configuring Git
+          git config --global credential.helper store
+          echo "https://${GITHUB_TOKEN}:x-oauth-basic@github.com" > "${HOME}/.git-credentials"
+
           # Clone the infrastructure repository.
           hub config --global hub.protocol https
           hub clone ${GIT_REPO} infrastructure-repo
@@ -85,3 +89,8 @@ jobs:
           else
             echo "Nothing changed (everything up-to-date)."
           fi
+
+          # Clean up.
+          cd ..
+          rm -rf infrastructure-repo/
+          rm -f ${HOME}/.git-credentials

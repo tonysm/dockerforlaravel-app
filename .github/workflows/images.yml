@@ -43,8 +43,13 @@ jobs:
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
           chmod +x ./kustomize && sudo mv ./kustomize /usr/local/bin/kustomize
 
-          # Install the Hub CLI tool.
-          sudo apt-get install -y hub
+          # Install HUB CLI tool.
+          curl -LO https://github.com/github/hub/releases/download/v2.11.2/hub-linux-amd64-2.11.2.tgz
+          tar -zxf hub-linux-amd64-2.11.2.tgz
+          cd hub-linux-amd64-2.11.2
+          sudo ./install
+          hub --version
+          cd .. && rm -rf hub-linux-amd64-2.11.2/ hub-linux-amd64-2.11.2.tgz
 
           # Clone the infrastructure repository.
           hub clone ${GIT_REPO} infrastructure-repo && cd infrastructure-repo/

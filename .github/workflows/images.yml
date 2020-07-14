@@ -38,7 +38,7 @@ jobs:
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          GITHUB_USER: ${{ secrets.GIT_USER }}
+          GITHUB_NAME: 'Automated from Github Actions'
           GITHUB_PASSWORD: ${{ secrets.GIT_TOKEN }}
           GIT_REPO: "tonysm/dockerforlaravel-k8s-files"
         run: |
@@ -68,7 +68,7 @@ jobs:
           kustomize edit set image laravel-app-php=tonysm/docker4laravelapp-php:${RELEASE_VERSION}
 
           if [[ `git status --porcelain` ]]; then
-            hub config --global user.name "Github Actions Build"
+            hub config --global user.name "${GITHUB_NAME}"
             hub config --global user.email "${GIT_EMAIL}"
 
             # Add the changed kustomization file to our git stage to be commited.

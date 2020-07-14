@@ -37,6 +37,7 @@ jobs:
         env:
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           GIT_REPO: "tonysm/dockerforlaravel-k8s-files"
         run: |
           # Installs Kustomize.

@@ -38,8 +38,12 @@ jobs:
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GITHUB_USER: ${{ secrets.GIT_USER }}
+          GITHUB_PASSWORD: ${{ secrets.GIT_TOKEN }}
           GIT_REPO: "tonysm/dockerforlaravel-k8s-files"
         run: |
+          set -e
+
           # Installs Kustomize.
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
           chmod +x ./kustomize && sudo mv ./kustomize /usr/local/bin/kustomize
@@ -53,7 +57,8 @@ jobs:
           cd .. && rm -rf hub-linux-amd64-2.11.2/ hub-linux-amd64-2.11.2.tgz
 
           # Clone the infrastructure repository.
-          hub clone ${GIT_REPO} infrastructure-repo && cd infrastructure-repo/
+          hub clone ${GIT_REPO} infrastructure-repo
+          cd infrastructure-repo/
           # Create a branch
           git checkout -b release-${RELEASE_VERSION}
 

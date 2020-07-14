@@ -57,6 +57,7 @@ jobs:
           cd .. && rm -rf hub-linux-amd64-2.11.2/ hub-linux-amd64-2.11.2.tgz
 
           # Clone the infrastructure repository.
+          hub config --global hub.protocol https
           hub clone ${GIT_REPO} infrastructure-repo
           cd infrastructure-repo/
           # Create a branch
@@ -67,7 +68,6 @@ jobs:
           kustomize edit set image laravel-app-php=tonysm/docker4laravelapp-php:${RELEASE_VERSION}
 
           if [[ `git status --porcelain` ]]; then
-              hub config --global hub.protocol https
               hub config --global user.name "Github Actions Build"
               hub config --global user.email "${GIT_EMAIL}"
 

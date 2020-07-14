@@ -34,5 +34,43 @@ jobs:
           tags: "latest,${{ env.RELEASE_VERSION }}"
           cache: ${{ github.event_name != 'schedule' }}
       - name: Patch Infrastructure Manifests
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+          GIT_REPO: "tonysm/dockerforlaravel-k8s-files"
         run: |
-          echo "Published image tag: ${RELEASE_VERSION}"
+          # Installs Kustomize.
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          chmod +x ./kustomize && sudo mv ./kustomize /usr/local/bin/kustomize
+
+          # Install the Hub CLI tool.
+          sudo apt-get install -y hub
+
+          # Clone the infrastructure repository.
+          hub clone ${GIT_REPO} infrastructure-repo && cd infrastructure-repo/
+          # Create a branch
+          git checkout -b release-${RELEASE_VERSION}
+
+          # Patch the new image.
+          kustomize edit set image laravel-app-nginx=tonysm/docker4laravelapp-nginx:${RELEASE_VERSION}
+          kustomize edit set image laravel-app-php=tonysm/docker4laravelapp-php:${RELEASE_VERSION}
+
+          if [[ `git status --porcelain` ]]; then
+              hub config --global hub.protocol https
+              hub config --global user.name "Github Actions Build"
+              hub config --global user.email "${GIT_EMAIL}"
+
+              # Add the changed kustomization file to our git stage to be commited.
+              hub add kustomization.yml
+
+              hub commit -F- <<EOF
+              Auto-release of the image version
+              This commit updates the application container image version to:
+                  ${RELEASE_VERSION}.
+              EOF
+
+              # Deployments to production will only happen after the infrastructure PR is merged.
+              hub pull-request -p -m "Auto-release of image version: ${RELEASE_VERSION}"
+          else
+              echo "Nothing changed (everything up-to-date)."
+          fi

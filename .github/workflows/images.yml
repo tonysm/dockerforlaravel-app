@@ -29,7 +29,7 @@ jobs:
           tags: "latest,${{ env.RELEASE_NAME }}"
       - name: Patch new image on infrastructure
         env:
-          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+          RELEASE_VERSION: ${{ env.RELEASE_NAME }}
           GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           GITHUB_NAME: 'Automated from Github Actions'

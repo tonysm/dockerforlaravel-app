@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+  schedule:
+    - cron: '0 2 * * 0' # Weekly on Sundays at 02:00
 
 jobs:
   build:
@@ -21,6 +23,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: "latest,${{ env.RELEASE_NAME }}"
+          cache: ${{ github.event_name != 'schedule' }}
       - name: Publish Nginx image to Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -29,6 +32,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: "latest,${{ env.RELEASE_NAME }}"
+          cache: ${{ github.event_name != 'schedule' }}
       - name: Patch new image on infrastructure
         env:
           RELEASE_VERSION: ${{ env.RELEASE_NAME }}

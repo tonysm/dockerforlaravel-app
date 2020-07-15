@@ -13,17 +13,19 @@ jobs:
       - name: Get release version
         id: get_version
         run: echo ::set-env name=RELEASE_NAME::$(echo ${GITHUB_SHA:0:7})
-      - name: Publish Nginx image to Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: tonysm/docker4laravelapp-nginx
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: "latest,${{ env.RELEASE_NAME }}"
       - name: Publish PHP image to Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: tonysm/docker4laravelapp-php
+          dockerfile: .docker/php/prod.Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: "latest,${{ env.RELEASE_NAME }}"
+      - name: Publish Nginx image to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: tonysm/docker4laravelapp-nginx
+          dockerfile: .docker/nginx/prod.Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: "latest,${{ env.RELEASE_NAME }}"

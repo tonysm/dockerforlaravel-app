@@ -15,7 +15,7 @@
                     @endif
 
                     <p>
-                        You are logged in!
+                        You are logged in on the new version!!
                     </p>
 
                     <form action="{{ route("home.store") }}" method="POST">

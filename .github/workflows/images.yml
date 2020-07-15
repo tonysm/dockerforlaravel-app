@@ -44,11 +44,11 @@ jobs:
         run: |
           set -e
 
-          # Installs Kustomize.
+          # Installs Kustomize
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
           chmod +x ./kustomize && sudo mv ./kustomize /usr/local/bin/kustomize
 
-          # Install HUB CLI tool.
+          # Install HUB CLI tool
           curl -LO https://github.com/github/hub/releases/download/v2.11.2/hub-linux-amd64-2.11.2.tgz
           tar -zxf hub-linux-amd64-2.11.2.tgz
           cd hub-linux-amd64-2.11.2
